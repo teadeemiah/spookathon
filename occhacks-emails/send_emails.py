@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 resend.api_key = os.getenv("RESEND_API_KEY")
-FROM_EMAIL = os.getenv("RESEND_FROM", "onboarding@resend.dev")
+FROM_EMAIL = os.getenv("RESEND_FROM")
 REPLY_TO_EMAIL = os.getenv("RESEND_REPLY_TO")
 
 CSV_FILE = "test email.csv"
@@ -20,7 +20,6 @@ def send_spookathon_alumni_emails():
             email = row.get("Email Address")
 
             if not email:
-                print(f"[{index + 1}] Skipping row: No email found in row {row}")
                 continue
 
             html_content = f"""
@@ -52,12 +51,11 @@ def send_spookathon_alumni_emails():
 
             params = {
                 "from": FROM_EMAIL,
+                "reply_to": REPLY_TO_EMAIL,
                 "to": [email],
                 "subject": "From Spookathon to OCC Hacks 2026! 🚀 (October 10–11)",
                 "html": html_content
             }
-            if REPLY_TO_EMAIL:
-                params["reply_to"] = REPLY_TO_EMAIL
 
             try:
                 response = resend.Emails.send(params)
@@ -65,7 +63,7 @@ def send_spookathon_alumni_emails():
             except Exception as e:
                 print(f"[{index + 1}] Failed to send to {email}: {e}")
 
-            time.sleep(0.3)
+            time.sleep(0.9)
 
 if __name__ == "__main__":
     send_spookathon_alumni_emails()
